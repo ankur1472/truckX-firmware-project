@@ -1,0 +1,43 @@
+//This code is written considering Arduino Uno in action as both MCU1 and MCU2. We are communicating via UART communication 
+//MASTER MCU1 code
+int Vol_sensor_Pin = A0;  // input pin for the voltage signal 
+int Temp_sensor_Pin = A1; // input pin for temp sensor 
+int digitalValue1 = 0;// variable to store the value coming from Voltage 
+int digitalValue2 = 0; // variable to store the value coming from Temp sensor 
+int counter = 1;
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop() {
+
+  digitalValue1 = analogRead(Vol_sensor_Pin);// read the value from the voltage signal
+  digitalValue2= analogRead(Temp_sensor_Pin); //read the value from the Temp sensor 
+  Serial.write(digitalValue1);
+  Serial.write(digitalValue2);
+  Serial.write(counter);
+  delay(1000);
+  counter++;
+}
+
+//Slave MCU2 Code
+ int received_data[3];
+ int volt_sensor = 0;
+ int Temp_value = 0;
+int counter=0; // counter for ACK 
+  void setup() { // Begin the Serial at 9600 Baud
+    Serial.begin(9600);
+  }
+  
+  void loop() {
+  if(Serial.available()>0){
+    received_data = Serial.read(); // reading data from serial buffer 
+   volt_sensor= received_data[0]; // storing voltage value
+  Temp_value=received_data[1];  // storing temp data 
+  counter = received_data[2]; // storing received counter 
+    delay(1000);
+ Serial.write(counter); // Acknowledging the received value by sending counter 
+
+  }
+}
